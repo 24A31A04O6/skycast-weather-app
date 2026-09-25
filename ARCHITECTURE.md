@@ -3,7 +3,7 @@
 > **Prime directive:** the Frontend never talks to external weather APIs. Every request
 > flows Browser → Our Backend → Provider. The API key never leaves the server.
 
-> **Progress:** ✅ Phase 0 restructure · ✅ Phase 1 skeleton · ✅ Phase 2 provider adapters · ✅ Phase 3 cache + rate limiting + LIVE `/api/v1/weather` (49 tests) — next: Phase 4 frontend refactor onto the backend API.
+> **Progress:** ✅ Phase 0 restructure · ✅ Phase 1 skeleton · ✅ Phase 2 provider adapters · ✅ Phase 3 cache/limits/live `/weather` (49 tests) · ✅ Phase 4 frontend switchover — the browser is provider-free (CSP `connect-src 'self'`, CI exemption removed, 17 ES modules). Next: Phase 5 E2E integration.
 
 ---
 

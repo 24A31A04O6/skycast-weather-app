@@ -1,6 +1,6 @@
 # 🌤️ SkyCast — Production-Grade Weather Dashboard
 
-> **Status:** ✅ Phase 0 (restructure) · ✅ Phase 1 (skeleton) · ✅ Phase 2 (providers + failover) · ✅ Phase 3 (**live `/api/v1/weather`** with TTL cache, stale-on-error, rate limiting, zod validation — 49 tests) — next up: **Phase 4 · frontend refactor onto the backend API**. See [ARCHITECTURE.md](ARCHITECTURE.md).
+> **Status:** ✅ Phase 0–3 complete · ✅ **Phase 4: the browser is now provider-free** — the frontend talks *only* to our backend (`/api/v1/*`), enforced by CSP `connect-src 'self'` + a CI guard with zero exemptions. Next: **Phase 5 · E2E integration suite**. See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 A modern, responsive weather dashboard built with **vanilla HTML, CSS, and JavaScript** — no frameworks, no build step, no dependencies. Live data from the OpenWeatherMap API, wrapped in an atmospheric UI with dynamic weather-reactive skies, glassmorphism panels, and fluid micro-interactions.
 
@@ -34,34 +34,24 @@ A modern, responsive weather dashboard built with **vanilla HTML, CSS, and JavaS
 
 ## 🚀 Getting Started
 
-### Run it with the backend (recommended from Phase 1 on)
-
 ```bash
 cd backend
-cp .env.example .env        # optional today — required from Phase 2 for live OWM data
+cp .env.example .env        # then paste your OpenWeatherMap key into OPENWEATHER_API_KEY
 npm install
 npm start                   # → http://localhost:3000  (serves the app AND the API)
 ```
+
+> No OpenWeatherMap key yet? Grab a free one at [openweathermap.org](https://home.openweathermap.org/api_keys) (new keys take ~10 min to activate). **The key lives only in `backend/.env`** — until it's set, the key-less Open-Meteo provider serves data automatically. The browser bundle contains no keys and cannot call weather providers (CSP-enforced).
 
 The backend serves `frontend/` at the root (single origin — no CORS) and exposes:
 
 | Endpoint | Status |
 |---|---|
-| `GET /api/v1/health` | ✅ live — provider/cache config snapshot |
-| `GET /api/v1/weather?city=…\|lat,lon` | 🚧 Phase 2–3 (returns `501 NOT_IMPLEMENTED`) |
-| `GET /api/v1/geocode?q=…` | 🚧 Phase 2–3 (returns `501 NOT_IMPLEMENTED`) |
+| `GET /api/v1/health` | ✅ live — provider chain + cache statistics |
+| `GET /api/v1/weather?city=…\|lat,lon` | ✅ live — cached (10 min), stale-on-error, rate-limited |
+| `GET /api/v1/geocode?q=…` · `/reverse` | ✅ live — cached (24 h) |
 
-Run backend tests: `npm test` (inside `backend/`).
-
-### Run the frontend standalone (legacy demo mode)
-
-Serve the `frontend/` folder with any static server — the app falls back to key-less Open-Meteo demo mode until `API_KEY` is set in `frontend/js/app.js`:
-
-```bash
-cd frontend && python3 -m http.server 8080
-```
-
-> No OpenWeatherMap key yet? Grab a free one at [openweathermap.org](https://home.openweathermap.org/api_keys). Brand-new keys can take ~10 minutes to activate.
+Run backend tests: `npm test` (inside `backend/`) — 49 contract/integration tests.
 
 ## 📁 Project Structure
 
@@ -72,8 +62,13 @@ skycast-weather-app/
 ├── frontend/                  # browser territory — no secrets cross this line
 │   ├── index.html
 │   ├── styles/style.css       # sky themes, FX, glassmorphism, responsive grid
-│   └── js/app.js              # UI, FX engine, toasts, chips, unit system
-│                               #   (split into modules in Phase 4)
+│   └── js/
+│       ├── main.js            # entrypoint: wires stores, components, API
+│       ├── api/client.js      # ★ the ONLY module that talks to the server (/api/v1)
+│       ├── store/             # units · recents · volatile state
+│       ├── components/        # hero · hourly · daily · tiles · chips · toasts · skeleton · search
+│       ├── fx/                # sky/particle engine
+│       └── utils/             # format (°C⇄°F, clocks) · icons · errors
 ├── backend/                   # server territory — all secrets live here
 │   └── .env.example           # key NAMES only; real .env is git-ignored
 ├── docs/                      # screenshots

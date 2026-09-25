@@ -24,11 +24,10 @@ export const ERROR_CODES = Object.freeze({
 /*
  * Content-Security-Policy applied to everything this server serves.
  *
- * `connect-src` deliberately includes the three key-less provider hosts the
- * frontend's STANDALONE demo mode still calls directly. This is a temporary,
- * documented exemption (mirrors the CI guard exemption for app.js) and MUST
- * be reduced to 'self' in Phase 4, when the browser routes every request
- * through this backend.
+ * `connect-src 'self'` is the ARCHITECTURE.md §1 enforcement: the browser
+ * physically cannot call any weather provider — every data request must be
+ * a same-origin /api/v1 call. (Since Phase 4 the frontend has zero provider
+ * knowledge; this header guarantees it stays that way.)
  */
 export const CSP_DIRECTIVES = Object.freeze({
   defaultSrc: ["'self'"],
@@ -36,11 +35,6 @@ export const CSP_DIRECTIVES = Object.freeze({
   styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
   fontSrc: ["'self'", "https://fonts.gstatic.com"],
   imgSrc: ["'self'", "data:"],
-  connectSrc: [
-    "'self'",
-    "https://api.open-meteo.com",
-    "https://geocoding-api.open-meteo.com",
-    "https://api.bigdatacloud.net",
-  ],
+  connectSrc: ["'self'"],
   upgradeInsecureRequests: [],
 });

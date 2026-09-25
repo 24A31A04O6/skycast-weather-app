@@ -59,7 +59,10 @@ export const env = Object.freeze({
 
   /** Optional base-URL overrides (testing / proxying). */
   OPENWEATHER_BASE_URL: str("OPENWEATHER_BASE_URL", { devFallback: "https://api.openweathermap.org/data/2.5" }),
+  OPENWEATHER_GEO_URL: str("OPENWEATHER_GEO_URL", { devFallback: "https://api.openweathermap.org/geo/1.0" }),
   OPENMETEO_BASE_URL: str("OPENMETEO_BASE_URL", { devFallback: "https://api.open-meteo.com/v1" }),
+  OPENMETEO_GEOCODE_URL: str("OPENMETEO_GEOCODE_URL", { devFallback: "https://geocoding-api.open-meteo.com/v1" }),
+  REVERSE_GEO_URL: str("REVERSE_GEO_URL", { devFallback: "https://api.bigdatacloud.net/data/reverse-geocode-client" }),
 
   /** Comma-separated extra allowed CORS origins (for a future split deploy). */
   CORS_ORIGINS: (str("CORS_ORIGINS", { devFallback: "" }) ?? "")

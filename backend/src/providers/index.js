@@ -109,3 +109,16 @@ export async function geocodeWithFailover(q) {
   }
   throw failures[0] ?? new AppError(404, "CITY_NOT_FOUND", `No match for “${q}”.`);
 }
+
+/** Reverse geocode through the first provider that returns a label (or null). */
+export async function reverseWithFailover(lat, lon) {
+  for (const provider of providerChain()) {
+    try {
+      const place = await provider.reverse(lat, lon);
+      if (place) return place;
+    } catch (err) {
+      logger.warn(`reverse via ${provider.name} failed: ${err.message}`);
+    }
+  }
+  return null; // cosmetic — the weather lookup itself doesn't need a label
+}

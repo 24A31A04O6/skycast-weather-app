@@ -1,23 +1,16 @@
 /* ============================================================================
  * SkyCast backend — src/routes/geocode.routes.js
  * ----------------------------------------------------------------------------
- * GET /api/v1/geocode?q=…            (forward: city search)
- * GET /api/v1/geocode/reverse?lat=&lon=  (reverse: GPS button support)
- *
- * PHASE 1 STUB — 501 until the geocoding proxy (Phase 2/3).
+ * GET /api/v1/geocode?q=…                — forward city search
+ * GET /api/v1/geocode/reverse?lat=&lon=  — reverse label for the GPS button
+ * (LIVE as of Phase 3 — replaces the Phase 1 501 stubs.)
  * ========================================================================== */
 import { Router } from "express";
-import { AppError, asyncHandler } from "../utils/errors.js";
+import { apiRateLimit } from "../middleware/rateLimit.js";
+import { validateQuery, geocodeQuerySchema, reverseQuerySchema } from "../middleware/validate.js";
+import { searchPlaces, reversePlaces } from "../controllers/geocode.controller.js";
 
 export const geocodeRoutes = Router();
 
-const stub = asyncHandler(async () => {
-  throw new AppError(
-    501,
-    "NOT_IMPLEMENTED",
-    "GET /api/v1/geocode arrives in Phases 2–3. See ARCHITECTURE.md."
-  );
-});
-
-geocodeRoutes.get("/", stub);
-geocodeRoutes.get("/reverse", stub);
+geocodeRoutes.get("/", apiRateLimit, validateQuery(geocodeQuerySchema), searchPlaces);
+geocodeRoutes.get("/reverse", apiRateLimit, validateQuery(reverseQuerySchema), reversePlaces);

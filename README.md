@@ -1,6 +1,6 @@
 # 🌤️ SkyCast — Production-Grade Weather Dashboard
 
-> **Status:** ✅ Phase 0 (restructure) · ✅ Phase 1 (Express skeleton) · ✅ Phase 2 (provider adapters + failover, 28 mocked tests) — next up: **Phase 3 · cache + rate limiting + live `/api/v1/weather`**. See [ARCHITECTURE.md](ARCHITECTURE.md).
+> **Status:** ✅ Phase 0 (restructure) · ✅ Phase 1 (skeleton) · ✅ Phase 2 (providers + failover) · ✅ Phase 3 (**live `/api/v1/weather`** with TTL cache, stale-on-error, rate limiting, zod validation — 49 tests) — next up: **Phase 4 · frontend refactor onto the backend API**. See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 A modern, responsive weather dashboard built with **vanilla HTML, CSS, and JavaScript** — no frameworks, no build step, no dependencies. Live data from the OpenWeatherMap API, wrapped in an atmospheric UI with dynamic weather-reactive skies, glassmorphism panels, and fluid micro-interactions.
 

@@ -1,12 +1,13 @@
 /* ============================================================================
  * SkyCast backend — test/api.test.js
  * ----------------------------------------------------------------------------
- * HTTP-level contract tests for the Phase 1 skeleton (Supertest drives the
- * app without binding a port). These encode ARCHITECTURE.md §2.1:
- *   • health answers 200 with a known shape
+ * HTTP-level contract tests for the always-on surface (no provider mocks
+ * needed here — these routes never leave the server):
+ *   • health answers 200 with a known shape (incl. live cache stats)
  *   • unknown routes → 404 { error: { code: "NOT_FOUND" } }
- *   • contract-live stubs → 501 { error: { code: "NOT_IMPLEMENTED" } }
- *   • / serves the frontend HTML (single-origin wiring)
+ *   • / serves the frontend HTML (single-origin wiring) + CSP header
+ * Weather/geocode endpoint behaviour lives in weather.api.test.js, where
+ * the provider chain is mocked.
  * ========================================================================== */
 import { describe, it, expect } from "vitest";
 import request from "supertest";
@@ -20,8 +21,10 @@ describe("GET /api/v1/health", () => {
     expect(res.body.status).toBe("ok");
     expect(res.body.service).toBe("skycast-backend");
     expect(typeof res.body.uptimeSeconds).toBe("number");
-    expect(res.body.providers).toHaveProperty("openweather");
-    expect(res.body.providers).toHaveProperty("openmeteo");
+    expect(Array.isArray(res.body.providers.chain)).toBe(true);
+    expect(res.body.providers.chain).toContain("openmeteo");
+    expect(res.body.cache.status).toBe("active");
+    expect(typeof res.body.cache.hitRate).toBe("number");
     expect(typeof res.body.timestamp).toBe("string");
   });
 });
@@ -34,29 +37,6 @@ describe("API 404 shape", () => {
     expect(res.body.error.code).toBe("NOT_FOUND");
     expect(typeof res.body.error.message).toBe("string");
     expect(res.body.error.message).not.toMatch(/stack|at\s+\//i); // no stack leakage
-  });
-});
-
-describe("Phase 1 contract stubs", () => {
-  it("GET /api/v1/weather → 501 NOT_IMPLEMENTED", async () => {
-    const res = await request(app).get("/api/v1/weather?city=hyderabad");
-
-    expect(res.status).toBe(501);
-    expect(res.body.error.code).toBe("NOT_IMPLEMENTED");
-  });
-
-  it("GET /api/v1/geocode → 501 NOT_IMPLEMENTED", async () => {
-    const res = await request(app).get("/api/v1/geocode?q=hyd");
-
-    expect(res.status).toBe(501);
-    expect(res.body.error.code).toBe("NOT_IMPLEMENTED");
-  });
-
-  it("GET /api/v1/geocode/reverse → 501 NOT_IMPLEMENTED", async () => {
-    const res = await request(app).get("/api/v1/geocode/reverse?lat=17.4&lon=78.5");
-
-    expect(res.status).toBe(501);
-    expect(res.body.error.code).toBe("NOT_IMPLEMENTED");
   });
 });
 

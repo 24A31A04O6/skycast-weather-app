@@ -11,7 +11,7 @@ import { app } from "./app.js";
 const server = app.listen(env.PORT, () => {
   logger.info(`SkyCast backend v${process.env.npm_package_version ?? "dev"} listening on :${env.PORT} (${env.NODE_ENV})`);
   if (!env.OPENWEATHER_API_KEY) {
-    logger.warn("OPENWEATHER_API_KEY is not set — /api/v1/weather will 501 until Phase 2–3 and needs it configured.");
+    logger.warn("OPENWEATHER_API_KEY is not set — /api/v1/weather is served by the key-less Open-Meteo provider (add a key to enable the OpenWeatherMap primary).");
   }
 });
 

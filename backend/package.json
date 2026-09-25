@@ -1,0 +1,26 @@
+{
+  "name": "skycast-backend",
+  "version": "0.1.0",
+  "description": "SkyCast backend — API gateway for weather providers: routing, secrets, caching, normalisation. See ARCHITECTURE.md.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.0",
+    "vitest": "^3.2.0"
+  }
+}

@@ -1,5 +1,7 @@
 # 🌤️ SkyCast — Production-Grade Weather Dashboard
 
+> **Status:** ✅ Phase 0 (frontend/backend restructure) · ✅ Phase 1 (Express backend skeleton: `/api/v1/health`, uniform errors, CSP, single-origin serving) — next up: **Phase 2 · provider adapters**. See [ARCHITECTURE.md](ARCHITECTURE.md).
+
 A modern, responsive weather dashboard built with **vanilla HTML, CSS, and JavaScript** — no frameworks, no build step, no dependencies. Live data from the OpenWeatherMap API, wrapped in an atmospheric UI with dynamic weather-reactive skies, glassmorphism panels, and fluid micro-interactions.
 
 ![SkyCast desktop screenshot](docs/screenshot-desktop.png)
@@ -32,21 +34,34 @@ A modern, responsive weather dashboard built with **vanilla HTML, CSS, and JavaS
 
 ## 🚀 Getting Started
 
-1. **Clone / download** this repository.
-2. Open `script.js` and paste your OpenWeatherMap API key at the top:
+### Run it with the backend (recommended from Phase 1 on)
 
-   ```js
-   const API_KEY = "YOUR_API_KEY_HERE"; // ← your key goes here
-   ```
+```bash
+cd backend
+cp .env.example .env        # optional today — required from Phase 2 for live OWM data
+npm install
+npm start                   # → http://localhost:3000  (serves the app AND the API)
+```
 
-   > No key yet? Grab a free one at [openweathermap.org](https://home.openweathermap.org/api_keys). Brand-new keys can take ~10 minutes to activate.
-   > Until a valid key is set, SkyCast runs in **demo mode** powered by the free [Open-Meteo](https://open-meteo.com) API — full feature set, no key required.
-3. Serve the folder (or just open `index.html`):
+The backend serves `frontend/` at the root (single origin — no CORS) and exposes:
 
-   ```bash
-   python3 -m http.server 8080
-   # then visit http://localhost:8080
-   ```
+| Endpoint | Status |
+|---|---|
+| `GET /api/v1/health` | ✅ live — provider/cache config snapshot |
+| `GET /api/v1/weather?city=…\|lat,lon` | 🚧 Phase 2–3 (returns `501 NOT_IMPLEMENTED`) |
+| `GET /api/v1/geocode?q=…` | 🚧 Phase 2–3 (returns `501 NOT_IMPLEMENTED`) |
+
+Run backend tests: `npm test` (inside `backend/`).
+
+### Run the frontend standalone (legacy demo mode)
+
+Serve the `frontend/` folder with any static server — the app falls back to key-less Open-Meteo demo mode until `API_KEY` is set in `frontend/js/app.js`:
+
+```bash
+cd frontend && python3 -m http.server 8080
+```
+
+> No OpenWeatherMap key yet? Grab a free one at [openweathermap.org](https://home.openweathermap.org/api_keys). Brand-new keys can take ~10 minutes to activate.
 
 ## 📁 Project Structure
 

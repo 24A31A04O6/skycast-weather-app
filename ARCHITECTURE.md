@@ -3,6 +3,8 @@
 > **Prime directive:** the Frontend never talks to external weather APIs. Every request
 > flows Browser → Our Backend → Provider. The API key never leaves the server.
 
+> **Progress:** ✅ Phase 0 restructure · ✅ Phase 1 backend skeleton — next: Phase 2 provider adapters.
+
 ---
 
 ## 0) System Overview

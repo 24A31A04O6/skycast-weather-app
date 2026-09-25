@@ -1,6 +1,6 @@
 # 🌤️ SkyCast — Production-Grade Weather Dashboard
 
-> **Status:** ✅ Phase 0–4 complete · ✅ **Phase 5: E2E integration suite** — 8 Playwright specs drive the real stack in CI (user journeys, cache HITs, GPS, toast-retry, and a CSP proof that the browser cannot reach weather providers). Next: **Phase 6 · deploy**. See [ARCHITECTURE.md](ARCHITECTURE.md).
+> **Status:** 🏁 **All phases complete** — Phase 0 restructure · 1 skeleton · 2 providers+failover · 3 cache/rate-limits/live API (49 tests) · 4 provider-free browser · 5 E2E suite (8 Playwright specs) · 6 **deployment-ready** (Dockerfile + Render Blueprint + Railway config — see [docs/DEPLOY.md](docs/DEPLOY.md)). Full blueprint: [ARCHITECTURE.md](ARCHITECTURE.md).
 
 A modern, responsive weather dashboard built with **vanilla HTML, CSS, and JavaScript** — no frameworks, no build step, no dependencies. Live data from the OpenWeatherMap API, wrapped in an atmospheric UI with dynamic weather-reactive skies, glassmorphism panels, and fluid micro-interactions.
 
@@ -105,6 +105,20 @@ skycast-weather-app/
 - **HTML5** — semantic, accessible markup
 - **CSS3** — custom properties, `backdrop-filter` glass (with solid fallback), fluid `clamp()` type, keyframe particle system
 - **Vanilla JavaScript (ES2020+)** — `async/await`, `AbortController`, `localStorage`, inline SVG icons, zero dependencies
+
+## 🚢 Deployment
+
+One service, one secret. Pick a path from **[docs/DEPLOY.md](docs/DEPLOY.md)**:
+
+| Path | What you need | Time |
+|---|---|---|
+| **Render** (Blueprint, free tier) | just paste your OWM key when prompted | ~5 min |
+| **Railway** (`railway.json`) | set Root Directory `backend` + the key | ~3 min |
+| **Docker** (`Dockerfile`) | any container host or your own box | ~1 min |
+
+```bash
+docker build -t skycast . && docker run -p 3000:3000 -e OPENWEATHER_API_KEY=your_key skycast
+```
 
 ## 🙌 Credits
 

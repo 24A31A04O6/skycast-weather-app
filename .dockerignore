@@ -1,0 +1,13 @@
+# Never bake secrets or junk into the image
+.env
+backend/.env
+node_modules
+**/node_modules
+.git
+.github
+e2e
+docs
+*.md
+.gitignore
+e2e/test-results
+e2e/playwright-report

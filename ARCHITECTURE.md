@@ -3,7 +3,7 @@
 > **Prime directive:** the Frontend never talks to external weather APIs. Every request
 > flows Browser → Our Backend → Provider. The API key never leaves the server.
 
-> **Progress:** ✅ Phase 0 restructure · ✅ Phase 1 skeleton · ✅ Phase 2 provider adapters · ✅ Phase 3 cache/limits/live `/weather` (49 tests) · ✅ Phase 4 frontend switchover · ✅ Phase 5 E2E suite (8 Playwright specs: journeys, cache HIT, GPS, toast-retry, CSP proof — runs in CI). Next: Phase 6 deploy.
+> **Progress:** 🏁 **All phases complete.** ✅ 0 restructure · ✅ 1 skeleton · ✅ 2 providers · ✅ 3 cache/limits · ✅ 4 provider-free browser · ✅ 5 E2E (8 specs in CI) · ✅ 6 deployment artifacts (Dockerfile, render.yaml Blueprint, railway.json, Procfile — guide: docs/DEPLOY.md).
 
 ---
 

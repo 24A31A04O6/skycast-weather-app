@@ -3,7 +3,7 @@
 > **Prime directive:** the Frontend never talks to external weather APIs. Every request
 > flows Browser → Our Backend → Provider. The API key never leaves the server.
 
-> **Progress:** ✅ Phase 0 restructure · ✅ Phase 1 skeleton · ✅ Phase 2 provider adapters · ✅ Phase 3 cache/limits/live `/weather` (49 tests) · ✅ Phase 4 frontend switchover — the browser is provider-free (CSP `connect-src 'self'`, CI exemption removed, 17 ES modules). Next: Phase 5 E2E integration.
+> **Progress:** ✅ Phase 0 restructure · ✅ Phase 1 skeleton · ✅ Phase 2 provider adapters · ✅ Phase 3 cache/limits/live `/weather` (49 tests) · ✅ Phase 4 frontend switchover · ✅ Phase 5 E2E suite (8 Playwright specs: journeys, cache HIT, GPS, toast-retry, CSP proof — runs in CI). Next: Phase 6 deploy.
 
 ---
 
@@ -204,8 +204,12 @@ skycast-weather-app/
 │   │       ├── format.js            (temps, wind, visibility, clocks)
 │   │       ├── icons.js             (inline SVG set)
 │   │       └── errors.js            (backend code → friendly message map)
+│
+├── e2e/                             ← cross-stack Playwright suite (Phase 5)
+│   ├── playwright.config.js         (webServer boots the backend, health-gated)
 │   └── tests/
-│       └── e2e/                     (Playwright specs)
+│       ├── journeys.spec.js         (cold-start skeleton, search, unit toggle, chips)
+│       └── resilience.spec.js       (toast+retry, cache HIT, GPS, CSP proof)
 │
 ├── backend/                         ← SERVER TERRITORY (all secrets live here)
 │   ├── package.json

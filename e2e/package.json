@@ -1,0 +1,14 @@
+{
+  "name": "skycast-e2e",
+  "version": "0.1.0",
+  "description": "SkyCast end-to-end integration suite — drives the real backend + frontend stack with Playwright.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}

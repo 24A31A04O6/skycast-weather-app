@@ -1,6 +1,6 @@
 # 🌤️ SkyCast — Production-Grade Weather Dashboard
 
-> **Status:** ✅ Phase 0–3 complete · ✅ **Phase 4: the browser is now provider-free** — the frontend talks *only* to our backend (`/api/v1/*`), enforced by CSP `connect-src 'self'` + a CI guard with zero exemptions. Next: **Phase 5 · E2E integration suite**. See [ARCHITECTURE.md](ARCHITECTURE.md).
+> **Status:** ✅ Phase 0–4 complete · ✅ **Phase 5: E2E integration suite** — 8 Playwright specs drive the real stack in CI (user journeys, cache HITs, GPS, toast-retry, and a CSP proof that the browser cannot reach weather providers). Next: **Phase 6 · deploy**. See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 A modern, responsive weather dashboard built with **vanilla HTML, CSS, and JavaScript** — no frameworks, no build step, no dependencies. Live data from the OpenWeatherMap API, wrapped in an atmospheric UI with dynamic weather-reactive skies, glassmorphism panels, and fluid micro-interactions.
 
@@ -52,6 +52,13 @@ The backend serves `frontend/` at the root (single origin — no CORS) and expos
 | `GET /api/v1/geocode?q=…` · `/reverse` | ✅ live — cached (24 h) |
 
 Run backend tests: `npm test` (inside `backend/`) — 49 contract/integration tests.
+
+Run the E2E suite (boots the backend automatically, drives a real browser):
+
+```bash
+cd e2e && npm install && npx playwright install chromium
+npx playwright test        # 8 specs: journeys, caching, GPS, toasts, CSP proof
+```
 
 ## 📁 Project Structure
 

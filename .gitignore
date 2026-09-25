@@ -16,3 +16,7 @@ coverage/
 # Editor
 .vscode/
 .idea/
+
+# Playwright artifacts
+e2e/test-results/
+e2e/playwright-report/

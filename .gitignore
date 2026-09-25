@@ -1,4 +1,18 @@
+# OS junk
 .DS_Store
 Thumbs.db
 *.log
+
+# Secrets — never commit real keys
 .env
+backend/.env
+
+# Dependencies & builds
+node_modules/
+dist/
+coverage/
+.vite/
+
+# Editor
+.vscode/
+.idea/

@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  separation-of-concerns:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Syntax-check all frontend JS
+        run: |
+          find frontend/js -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      # Enforces ARCHITECTURE.md §1: the browser bundle must never reference
+      # weather providers or API keys. Phase 0 interim: the legacy dual-source
+      # pipeline still lives in frontend/js/app.js — it is explicitly
+      # allow-listed here and the exemption is REMOVED in Phase 4.
+      - name: Guard — no provider URLs / keys in frontend
+        run: |
+          if grep -rInE 'openweathermap\.org|open-meteo\.com|bigdatacloud\.net|appid=|API_KEY' \
+              frontend --exclude='app.js'; then
+            echo "::error::Provider reference found in frontend — all requests must route through the backend (see ARCHITECTURE.md)"
+            exit 1
+          fi

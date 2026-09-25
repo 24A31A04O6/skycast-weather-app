@@ -50,13 +50,23 @@ A modern, responsive weather dashboard built with **vanilla HTML, CSS, and JavaS
 
 ## 📁 Project Structure
 
+The repo is split into **absolute frontend / backend separation** — the browser bundle never talks to weather providers directly; everything routes through our backend (see [ARCHITECTURE.md](ARCHITECTURE.md) for the full contract, cache policy, and phase plan).
+
 ```
-weather-app/
-├── index.html    # Layout: hero, hourly slider, 5-day strip, 8 metric tiles, skeleton
-├── style.css     # Sky themes, ambient FX, glassmorphism, shimmer, responsive grid
-├── script.js     # API layer (async/await), FX engine, toasts, chips, unit system
-└── docs/         # Screenshots
+skycast-weather-app/
+├── frontend/                  # browser territory — no secrets cross this line
+│   ├── index.html
+│   ├── styles/style.css       # sky themes, FX, glassmorphism, responsive grid
+│   └── js/app.js              # UI, FX engine, toasts, chips, unit system
+│                               #   (split into modules in Phase 4)
+├── backend/                   # server territory — all secrets live here
+│   └── .env.example           # key NAMES only; real .env is git-ignored
+├── docs/                      # screenshots
+└── .github/workflows/ci.yml   # syntax checks + "no providers in frontend" guard
 ```
+
+> **Status:** Phase 0 (restructure) complete. The backend API arrives in Phases 1–3;
+> until then `frontend/js/app.js` runs in standalone demo mode exactly as before.
 
 ## 🖼️ Screenshots
 

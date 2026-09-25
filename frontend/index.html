@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyCast · Weather</title>
+  <meta name="description" content="SkyCast — a production-grade weather dashboard built with vanilla HTML, CSS and JavaScript." />
+  <meta name="theme-color" content="#141125" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+
+<body data-theme="default" data-units="c">
+
+  <!-- Ambient particle / glow layer (built by JS per weather condition) -->
+  <div class="fx" id="fx" aria-hidden="true"></div>
+
+  <div class="app">
+
+    <!-- ── Header: brand + °C/°F segmented toggle ─────────────────────── -->
+    <header class="app__header">
+      <h1 class="brand">
+        <svg class="brand__logo" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/>
+          <path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/>
+          <path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>
+        </svg>
+        <b>SkyCast</b>
+      </h1>
+
+      <div class="units" id="units-toggle" role="group" aria-label="Temperature units" data-units="c">
+        <span class="units__thumb" aria-hidden="true"></span>
+        <button type="button" class="units__btn" data-unit="c" aria-pressed="true">°C</button>
+        <button type="button" class="units__btn" data-unit="f" aria-pressed="false">°F</button>
+      </div>
+    </header>
+
+    <!-- ── Search row: input + submit + GPS ────────────────────────────── -->
+    <form class="search-row" id="search-form" role="search" autocomplete="off" novalidate>
+      <div class="search">
+        <input
+          type="text"
+          id="search-input"
+          class="search__input"
+          placeholder="Search any city… e.g. Hyderabad"
+          aria-label="City name"
+          maxlength="80"
+          spellcheck="false"
+        />
+        <button type="submit" id="search-btn" class="search__btn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </div>
+
+      <button type="button" id="gps-btn" class="gps-btn" aria-label="Use my current location" title="Use my current location">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/>
+          <line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/>
+          <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
+        </svg>
+      </button>
+    </form>
+
+    <!-- ── Recent searches quick-chip row ──────────────────────────────── -->
+    <nav class="chips" id="chips" aria-label="Recent searches" hidden></nav>
+
+    <!-- ── Error / info toasts (fixed overlay, built by JS) ────────────── -->
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+
+    <!-- ── Dashboard ───────────────────────────────────────────────────── -->
+    <main class="dash" id="dashboard">
+
+      <!-- Skeleton loading shimmer (mirrors the dashboard structure) -->
+      <section class="skeleton" id="skeleton" hidden aria-hidden="true">
+        <div class="sk glass sk-hero">
+          <div class="sk sk-line" style="width:52%;height:26px"></div>
+          <div class="sk sk-line" style="width:38%;height:14px"></div>
+          <div class="sk sk-circle"></div>
+          <div class="sk sk-line" style="width:44%;height:64px"></div>
+          <div class="sk sk-line" style="width:30%;height:18px"></div>
+          <div class="sk sk-line" style="width:24%;height:14px"></div>
+        </div>
+        <div class="sk glass sk-panel">
+          <div class="sk sk-line" style="width:34%;height:16px;margin-bottom:14px"></div>
+          <div class="sk-hours">
+            <div class="sk sk-block"></div><div class="sk sk-block"></div><div class="sk sk-block"></div>
+            <div class="sk sk-block"></div><div class="sk sk-block"></div><div class="sk sk-block"></div>
+          </div>
+        </div>
+        <div class="sk glass sk-panel">
+          <div class="sk sk-line" style="width:34%;height:16px;margin-bottom:14px"></div>
+          <div class="sk sk-line" style="width:88%;height:34px;margin-bottom:10px"></div>
+          <div class="sk sk-line" style="width:88%;height:34px;margin-bottom:10px"></div>
+          <div class="sk sk-line" style="width:88%;height:34px"></div>
+        </div>
+        <div class="metrics metrics--sk">
+          <div class="sk glass sk-tile"></div><div class="sk glass sk-tile"></div>
+          <div class="sk glass sk-tile"></div><div class="sk glass sk-tile"></div>
+          <div class="sk glass sk-tile"></div><div class="sk glass sk-tile"></div>
+          <div class="sk glass sk-tile"></div><div class="sk glass sk-tile"></div>
+        </div>
+      </section>
+
+      <!-- Real dashboard content -->
+      <section class="content" id="content" hidden>
+
+        <!-- Hero: current conditions -->
+        <article class="glass hero" id="hero-card">
+          <h2 class="hero__city" id="city-name">—</h2>
+          <p class="hero__date" id="local-date">—</p>
+          <div class="hero__icon" id="weather-icon" data-icon="cloud" aria-hidden="true"></div>
+          <p class="hero__temp">
+            <span id="temp-value">--</span><span class="hero__unit" id="temp-unit">°C</span>
+          </p>
+          <p class="hero__desc" id="weather-desc">—</p>
+          <p class="hero__hilo" id="hi-lo" hidden>
+            <span>H <b id="hi-value">--°</b></span><span class="hero__hilo-sep"></span>
+            <span>L <b id="lo-value">--°</b></span>
+          </p>
+        </article>
+
+        <!-- Hourly forecast slider -->
+        <article class="glass card">
+          <header class="card__head">
+            <span class="card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+            <h3 class="card__title">Next 24 hours</h3>
+            <span class="card__hint">scroll →</span>
+          </header>
+          <div class="card__body">
+            <div class="hourly" id="hourly" role="list" aria-label="Hourly forecast"></div>
+          </div>
+        </article>
+
+        <!-- 5-day forecast -->
+        <article class="glass card">
+          <header class="card__head">
+            <span class="card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </span>
+            <h3 class="card__title">5-day forecast</h3>
+          </header>
+          <div class="daily" id="daily" role="list" aria-label="5 day forecast"></div>
+        </article>
+
+        <!-- Expanded metric tiles -->
+        <section class="metrics" id="metrics" aria-label="Weather details">
+
+          <article class="glass tile">
+            <span class="tile__icon tile__icon--humidity" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
+            </span>
+            <span class="tile__label">Humidity</span>
+            <span class="tile__value" id="m-humidity">--</span>
+            <span class="tile__sub">Relative humidity</span>
+          </article>
+
+          <article class="glass tile">
+            <span class="tile__icon tile__icon--wind" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+            </span>
+            <span class="tile__label">Wind</span>
+            <span class="tile__value" id="m-wind">--</span>
+            <span class="tile__sub" id="m-wind-sub">Surface wind</span>
+          </article>
+
+          <article class="glass tile">
+            <span class="tile__icon tile__icon--feels" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+            </span>
+            <span class="tile__label">Feels Like</span>
+            <span class="tile__value" id="m-feels">--</span>
+            <span class="tile__sub">Perceived temperature</span>
+          </article>
+
+          <article class="glass tile">
+            <span class="tile__icon tile__icon--uv" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            </span>
+            <span class="tile__label">UV Index</span>
+            <span class="tile__value" id="m-uv">--</span>
+            <span class="tile__sub" id="m-uv-sub">—</span>
+          </article>
+
+          <article class="glass tile">
+            <span class="tile__icon tile__icon--vis" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+            <span class="tile__label">Visibility</span>
+            <span class="tile__value" id="m-vis">--</span>
+            <span class="tile__sub" id="m-vis-sub">Air clarity</span>
+          </article>
+
+          <article class="glass tile">
+            <span class="tile__icon tile__icon--pres" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+            </span>
+            <span class="tile__label">Pressure</span>
+            <span class="tile__value" id="m-pres">--</span>
+            <span class="tile__sub">Atmospheric · hPa</span>
+          </article>
+
+          <article class="glass tile">
+            <span class="tile__icon tile__icon--sunrise" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>
+            </span>
+            <span class="tile__label">Sunrise</span>
+            <span class="tile__value" id="m-sunrise">--</span>
+            <span class="tile__sub">Dawn</span>
+          </article>
+
+          <article class="glass tile">
+            <span class="tile__icon tile__icon--sunset" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10V2"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m16 6-4 4-4-4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>
+            </span>
+            <span class="tile__label">Sunset</span>
+            <span class="tile__value" id="m-sunset">--</span>
+            <span class="tile__sub">Dusk</span>
+          </article>
+
+        </section>
+      </section>
+    </main>
+
+    <footer class="app__footer" id="app-footer">SkyCast</footer>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
